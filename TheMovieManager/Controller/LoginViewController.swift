@@ -24,6 +24,12 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginTapped(_ sender: UIButton) {
+        getRequestToken {
+            self.login()
+        }
+    }
+    
+    private func getRequestToken(successHandler: @escaping () -> Void) {
         TMDBClient.getRequestToken { (success, error) in
             guard success else {
                 let errorMessage = error?.localizedDescription ?? ""
@@ -33,7 +39,7 @@ class LoginViewController: UIViewController {
             
             print("Token created successfully: \(TMDBClient.Auth.requestToken)")
             DispatchQueue.main.async {
-                self.login()
+                successHandler()
             }
         }
     }
