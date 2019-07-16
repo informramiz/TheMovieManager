@@ -14,4 +14,14 @@ extension UIViewController {
         dismiss(animated: true, completion: nil)
     }
     
+    func showErrorAlert(message: String) {
+        let alertController = UIAlertController()
+        alertController.message = message
+        
+        let okAction = UIAlertAction(title: "OK", style: .default) { action in
+            self.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(okAction)
+        present(alertController, animated: true, completion: nil)
+    }
 }
