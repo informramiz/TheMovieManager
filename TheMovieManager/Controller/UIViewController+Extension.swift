@@ -24,4 +24,10 @@ extension UIViewController {
         alertController.addAction(okAction)
         present(alertController, animated: true, completion: nil)
     }
+    
+    func showErrorAlertOnMain(message: String) {
+        DispatchQueue.main.async {
+            self.showErrorAlert(message: message)
+        }
+    }
 }
