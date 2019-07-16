@@ -66,6 +66,7 @@ class TMDBClient {
                 let requestTokenResponse = try JSONDecoder().decode(RequestTokenResponse.self, from: data)
                 if requestTokenResponse.success {
                     Auth.requestToken = requestTokenResponse.requestToken
+                    completionHandler(true, error)
                 } else {
                     completionHandler(false, error)
                 }
