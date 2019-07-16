@@ -3,6 +3,7 @@
 //  TheMovieManager
 //
 //  Created by Owen LaRosa on 8/13/18.
+//  Updated by Ramiz Raja on 14/07/19
 //  Copyright © 2018 Udacity. All rights reserved.
 //
 
@@ -47,11 +48,22 @@ class LoginViewController: UIViewController {
             }
             
             print("Token verified with username+password: \(TMDBClient.Auth.requestToken)")
+            self.createSessionId()
+        }
+    }
+    
+    private func createSessionId() {
+        TMDBClient.createSessionId { (success, error) in
+            guard success else {
+                self.showErrorAlertOnMain(message: error?.localizedDescription ?? "Login Failed due to unknown error")
+                return
+            }
+            
+            print("Successfully created session id: \(TMDBClient.Endpoints.createSessionId)")
             DispatchQueue.main.async {
                 self.performSegue(withIdentifier: "completeLogin", sender: nil)
             }
         }
-        
     }
     
     @IBAction func loginViaWebsiteTapped() {
