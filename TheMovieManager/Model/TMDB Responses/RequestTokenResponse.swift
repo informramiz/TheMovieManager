@@ -8,4 +8,18 @@
 
 import Foundation
 
-
+struct RequestTokenResponse: Codable {
+    let success: Bool
+    let expiresAt: String
+    let requestToken: String
+    let statusMessage: String?
+    let statusCode: String?
+    
+    enum CodingKeys: String, CodingKey {
+        case success
+        case expiresAt = "expires_at"
+        case requestToken = "request_token"
+        case statusMessage = "status_message"
+        case statusCode = "status_code"
+    }
+}
