@@ -58,7 +58,7 @@ class LoginViewController: UIViewController {
         }
     }
     
-    private func createSessionId() {
+    func createSessionId() {
         TMDBClient.createSessionId { (success, error) in
             guard success else {
                 self.showErrorAlertOnMain(message: error?.localizedDescription ?? "Login Failed due to unknown error")
