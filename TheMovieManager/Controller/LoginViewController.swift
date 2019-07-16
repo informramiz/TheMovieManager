@@ -26,17 +26,32 @@ class LoginViewController: UIViewController {
         TMDBClient.getRequestToken { (success, error) in
             guard success else {
                 let errorMessage = error?.localizedDescription ?? ""
-                DispatchQueue.main.async {
-                    self.showErrorAlert(message: errorMessage)
-                }
+                self.showErrorAlertOnMain(message: errorMessage)
                 return
             }
             
             print("Token created successfully: \(TMDBClient.Auth.requestToken)")
             DispatchQueue.main.async {
+                self.login()
+            }
+        }
+    }
+    
+    private func login() {
+        let username = emailTextField.text!
+        let password = passwordTextField.text!
+        TMDBClient.login(username: username, password: password) { (success, error) in
+            guard success else {
+                self.showErrorAlertOnMain(message: error?.localizedDescription ?? "Login failed due to unknown error")
+                return
+            }
+            
+            print("Token verified with username+password: \(TMDBClient.Auth.requestToken)")
+            DispatchQueue.main.async {
                 self.performSegue(withIdentifier: "completeLogin", sender: nil)
             }
         }
+        
     }
     
     @IBAction func loginViaWebsiteTapped() {
