@@ -3,6 +3,7 @@
 //  TheMovieManager
 //
 //  Created by Owen LaRosa on 8/13/18.
+//  Updated by Ramiz Raja on 14/07/19
 //  Copyright © 2018 Udacity. All rights reserved.
 //
 
@@ -13,6 +14,9 @@ class TMDBClient {
     //TODO: Remove it and move it to somewhere safe
     static let apiKey = "8a7b4cf5ff65fb391c470a670b052a4b"
     
+    //TODO: This should be saved using persistence (user settings) but
+    //because I (Ramiz) am only interested in practicing API authentication so
+    //I am not going to bother
     struct Auth {
         static var accountId = 0
         static var requestToken = ""
@@ -26,12 +30,14 @@ class TMDBClient {
         case getWatchlist
         case getRequestToken
         case login
+        case createSessionId
         
         var stringValue: String {
             switch self {
             case .getWatchlist: return Endpoints.base + "/account/\(Auth.accountId)/watchlist/movies" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
             case .getRequestToken: return Endpoints.base + "/authentication/token/new" + Endpoints.apiKeyParam
             case .login: return Endpoints.base + "/authentication/token/validate_with_login" + Endpoints.apiKeyParam
+            case .createSessionId: return Endpoints.base + "/authentication/session/new" + Endpoints.apiKeyParam
             }
         }
         
@@ -103,4 +109,26 @@ class TMDBClient {
         task.resume()
     }
     
+    class func createSessionId(completionHandler: @escaping (Bool, Error?) -> Void) {
+        var urlRequest = URLRequest(url: Endpoints.createSessionId.url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = try! JSONEncoder().encode(PostSession(requestToken: Auth.requestToken))
+        
+        let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            guard let data = data else {
+                completionHandler(false, error)
+                return
+            }
+            
+            do {
+                let sessionRequestResponse = try JSONDecoder().decode(SessionResponse.self, from: data)
+                Auth.sessionId = sessionRequestResponse.sessionId
+                completionHandler(true, nil)
+            } catch {
+                completionHandler(false, error)
+            }
+        }
+        task.resume()
+    }
 }
