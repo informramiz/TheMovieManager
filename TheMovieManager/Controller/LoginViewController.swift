@@ -33,14 +33,12 @@ class LoginViewController: UIViewController {
         TMDBClient.getRequestToken { (success, error) in
             guard success else {
                 let errorMessage = error?.localizedDescription ?? ""
-                self.showErrorAlertOnMain(message: errorMessage)
+                self.showErrorAlert(message: errorMessage)
                 return
             }
             
             print("Token created successfully: \(TMDBClient.Auth.requestToken)")
-            DispatchQueue.main.async {
-                successHandler()
-            }
+            successHandler()
         }
     }
     

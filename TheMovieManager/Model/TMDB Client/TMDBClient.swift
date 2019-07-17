@@ -148,17 +148,22 @@ class TMDBClient {
     class func taskForGetRequest<ResponseType: Decodable>(url: URL,
                                                           response: ResponseType.Type,
                                                           completionHandler: @escaping (ResponseType?, Error?) -> Void) {
+        let callCompletionHandler = { (response: ResponseType?, error: Error?) in
+            DispatchQueue.main.async {
+                completionHandler(response, error)
+            }
+        }
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             guard let data = data else {
-                completionHandler(nil, error!)
+                callCompletionHandler(nil, error!)
                 return
             }
             
             do {
                 let response = try JSONDecoder().decode(ResponseType.self, from: data)
-                completionHandler(response, nil)
+                callCompletionHandler(response, nil)
             } catch {
-                completionHandler(nil, error)
+                callCompletionHandler(nil, error)
             }
         }
         task.resume()
