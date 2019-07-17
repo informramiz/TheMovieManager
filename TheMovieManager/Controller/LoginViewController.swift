@@ -73,7 +73,10 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginViaWebsiteTapped() {
-        performSegue(withIdentifier: "completeLogin", sender: nil)
+        getRequestToken {
+            print("OAuth url" + TMDBClient.Endpoints.webAuth.url.absoluteString)
+            UIApplication.shared.open(TMDBClient.Endpoints.webAuth.url, options: [:], completionHandler: nil)
+        }
     }
     
 }

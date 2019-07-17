@@ -10,7 +10,8 @@ import UIKit
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
-
+    static let appBaseUrl = "themoviemanager"
+    static let authenticateEndpointPath = "authenticate"
     var window: UIWindow?
 
 
@@ -41,5 +42,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
     
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        let urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: true)!
+        if urlComponents.scheme == AppDelegate.appBaseUrl
+            && urlComponents.path == AppDelegate.authenticateEndpointPath {
+            let loginVC = window?.rootViewController as! LoginViewController
+            loginVC.createSessionId()
+            return true
+        }
+        return false
+    }
 }
 
