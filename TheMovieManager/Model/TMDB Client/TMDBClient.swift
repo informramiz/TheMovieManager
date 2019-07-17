@@ -74,50 +74,27 @@ class TMDBClient {
     }
     
     class func login(username: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void) {
-        var request = URLRequest(url: Endpoints.login.url)
-        request.httpMethod = "POST"
-        request.addValue("application/json", forHTTPHeaderField: "Content-Type")
         let loginRequest = LoginRequest(username: username, password: password, requestToken: Auth.requestToken)
-        request.httpBody = try! JSONEncoder().encode(loginRequest)
-        
-        let task = URLSession.shared.dataTask(with: request) { (data, response, error) in
-            guard let data = data else {
-                completionHandler(false, error)
-                return
-            }
-            
-            do {
-                let tokenRequest = try JSONDecoder().decode(RequestTokenResponse.self, from: data)
-                Auth.requestToken = tokenRequest.requestToken
+        taskForPostRequest(url: Endpoints.login.url, request: loginRequest, responseType: RequestTokenResponse.self) { (response, error) in
+            if let _ = response {
                 completionHandler(true, nil)
-            } catch {
+            } else {
                 completionHandler(false, error)
             }
         }
-        task.resume()
     }
     
     class func createSessionId(completionHandler: @escaping (Bool, Error?) -> Void) {
-        var urlRequest = URLRequest(url: Endpoints.createSessionId.url)
-        urlRequest.httpMethod = "POST"
-        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-        urlRequest.httpBody = try! JSONEncoder().encode(PostSession(requestToken: Auth.requestToken))
-        
-        let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            guard let data = data else {
-                completionHandler(false, error)
-                return
-            }
-            
-            do {
-                let sessionRequestResponse = try JSONDecoder().decode(SessionResponse.self, from: data)
-                Auth.sessionId = sessionRequestResponse.sessionId
+        let request = PostSession(requestToken: Auth.requestToken)
+        taskForPostRequest(url: Endpoints.createSessionId.url, request: request, responseType: SessionResponse.self) { (sessionResponse, error) in
+            if let sessionResponse = sessionResponse {
+                Auth.sessionId = sessionResponse.sessionId
                 completionHandler(true, nil)
-            } catch {
+            } else {
                 completionHandler(false, error)
             }
         }
-        task.resume()
+        
     }
     
     class func logout(completionHandler: @escaping (Bool, Error?) -> Void) {
@@ -145,6 +122,11 @@ class TMDBClient {
         task.resume()
     }
     
+    /*
+     We need parameter `response: ResponseType.Type` so that we can receive type information from the call regarding the
+     generic type `ResponseType`. We need this because in Swift we can't specialize functions by writing them like `taskForGetRequest<MyType>(...)`
+     as this syntax is invalid in Swift. So the only way to receive type info is to pass type info as param
+     */
     class func taskForGetRequest<ResponseType: Decodable>(url: URL,
                                                           response: ResponseType.Type,
                                                           completionHandler: @escaping (ResponseType?, Error?) -> Void) {
@@ -154,6 +136,43 @@ class TMDBClient {
             }
         }
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data else {
+                callCompletionHandler(nil, error!)
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(ResponseType.self, from: data)
+                callCompletionHandler(response, nil)
+            } catch {
+                callCompletionHandler(nil, error)
+            }
+        }
+        task.resume()
+    }
+    
+    /*
+     We need parameter `response: ResponseType.Type` so that we can receive type information from the call regarding the
+     generic type `ResponseType`. We need this because in Swift we can't specialize functions by writing them like `taskForPostRequest<MyType>(...)`
+     as this syntax is invalid in Swift. So the only way to receive type info is to pass type info as param
+     */
+    class func taskForPostRequest<RequestType: Encodable, ResponseType: Decodable>(url: URL,
+                                                                                   request: RequestType,
+                                                                                   responseType: ResponseType.Type,
+                                                                                   completionHandler: @escaping (ResponseType?, Error?) -> Void) {
+        let callCompletionHandler = { (response: ResponseType?, error: Error?) in
+            DispatchQueue.main.async {
+                completionHandler(response, error)
+            }
+        }
+        
+        //build http body
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = "POST"
+        urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+        urlRequest.httpBody = try! JSONEncoder().encode(request)
+        
+        let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
             guard let data = data else {
                 callCompletionHandler(nil, error!)
                 return
