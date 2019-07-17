@@ -8,4 +8,6 @@
 
 import Foundation
 
-
+struct TMDBResponse: Codable {
+    let success: Bool
+}

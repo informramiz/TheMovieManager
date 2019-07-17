@@ -12,7 +12,14 @@ import UIKit
 extension UIViewController {
     
     @IBAction func logoutTapped(_ sender: UIBarButtonItem) {
-        dismiss(animated: true, completion: nil)
+        TMDBClient.logout { (success, error) in
+            if success {
+                print("Session deleted successfully")
+            }
+            DispatchQueue.main.async {
+                self.dismiss(animated: true, completion: nil)
+            }
+        }
     }
     
     func showErrorAlert(message: String) {
