@@ -53,42 +53,24 @@ class TMDBClient {
     }
     
     class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
-        let task = URLSession.shared.dataTask(with: Endpoints.getWatchlist.url) { data, response, error in
-            guard let data = data else {
-                completion([], error)
-                return
-            }
-            let decoder = JSONDecoder()
-            do {
-                let responseObject = try decoder.decode(MovieResults.self, from: data)
-                completion(responseObject.results, nil)
-            } catch {
+        taskForGetRequest(url: Endpoints.getWatchlist.url, response: MovieResults.self) { (movieResults, error) in
+            if let movieResults = movieResults {
+                completion(movieResults.results, nil)
+            } else {
                 completion([], error)
             }
         }
-        task.resume()
     }
     
     class func getRequestToken(completionHandler: @escaping (Bool, Error?) -> Void) {
-        let task = URLSession.shared.dataTask(with: Endpoints.getRequestToken.url) { data, response, error in
-            guard let data = data else {
-                completionHandler(false, error!)
-                return
-            }
-            
-            do {
-                let requestTokenResponse = try JSONDecoder().decode(RequestTokenResponse.self, from: data)
-                if requestTokenResponse.success {
-                    Auth.requestToken = requestTokenResponse.requestToken
-                    completionHandler(true, error)
-                } else {
-                    completionHandler(false, error)
-                }
-            } catch {
+        taskForGetRequest(url: Endpoints.getRequestToken.url, response: RequestTokenResponse.self) { (response, error) in
+            if let response = response {
+                Auth.requestToken = response.requestToken
+                completionHandler(true, nil)
+            } else {
                 completionHandler(false, error)
             }
         }
-        task.resume()
     }
     
     class func login(username: String, password: String, completionHandler: @escaping (Bool, Error?) -> Void) {
@@ -158,6 +140,25 @@ class TMDBClient {
                 completionHandler(logoutResponse.success, error)
             } catch {
                 completionHandler(false, error)
+            }
+        }
+        task.resume()
+    }
+    
+    class func taskForGetRequest<ResponseType: Decodable>(url: URL,
+                                                          response: ResponseType.Type,
+                                                          completionHandler: @escaping (ResponseType?, Error?) -> Void) {
+        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let data = data else {
+                completionHandler(nil, error!)
+                return
+            }
+            
+            do {
+                let response = try JSONDecoder().decode(ResponseType.self, from: data)
+                completionHandler(response, nil)
+            } catch {
+                completionHandler(nil, error)
             }
         }
         task.resume()
