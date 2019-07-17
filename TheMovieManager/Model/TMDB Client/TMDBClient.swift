@@ -97,27 +97,17 @@ class TMDBClient {
         
     }
     
-    class func logout(completionHandler: @escaping (Bool, Error?) -> Void) {
+    class func logout(completionHandler: @escaping () -> Void) {
         var urlRequest = URLRequest(url: Endpoints.logout.url)
         urlRequest.httpMethod = "DELETE"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.httpBody = try! JSONEncoder().encode(LogoutRequest(sessionId: Auth.sessionId))
         
         let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            guard let data = data else {
-                completionHandler(false, error)
-                return
-            }
-            
-            do {
-                //clear data no matter what the API result because user will be logged out anyway
-                Auth.requestToken = ""
-                Auth.sessionId = ""
-                let logoutResponse = try JSONDecoder().decode(TMDBResponse.self, from: data)
-                completionHandler(logoutResponse.success, error)
-            } catch {
-                completionHandler(false, error)
-            }
+            //clear data no matter what the API result because user will be logged out anyway
+            Auth.requestToken = ""
+            Auth.sessionId = ""
+            completionHandler()
         }
         task.resume()
     }
