@@ -53,7 +53,7 @@ class TMDBClient {
     }
     
     class func getWatchlist(completion: @escaping ([Movie], Error?) -> Void) {
-        taskForGetRequest(url: Endpoints.getWatchlist.url, response: MovieResults.self) { (movieResults, error) in
+        taskForGetRequest(url: Endpoints.getWatchlist.url, responseType: MovieResults.self) { (movieResults, error) in
             if let movieResults = movieResults {
                 completion(movieResults.results, nil)
             } else {
@@ -63,7 +63,7 @@ class TMDBClient {
     }
     
     class func getRequestToken(completionHandler: @escaping (Bool, Error?) -> Void) {
-        taskForGetRequest(url: Endpoints.getRequestToken.url, response: RequestTokenResponse.self) { (response, error) in
+        taskForGetRequest(url: Endpoints.getRequestToken.url, responseType: RequestTokenResponse.self) { (response, error) in
             if let response = response {
                 Auth.requestToken = response.requestToken
                 completionHandler(true, nil)
@@ -128,25 +128,10 @@ class TMDBClient {
      as this syntax is invalid in Swift. So the only way to receive type info is to pass type info as param
      */
     class func taskForGetRequest<ResponseType: Decodable>(url: URL,
-                                                          response: ResponseType.Type,
+                                                          responseType: ResponseType.Type,
                                                           completionHandler: @escaping (ResponseType?, Error?) -> Void) {
-        let callCompletionHandler = { (response: ResponseType?, error: Error?) in
-            DispatchQueue.main.async {
-                completionHandler(response, error)
-            }
-        }
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
-            guard let data = data else {
-                callCompletionHandler(nil, error!)
-                return
-            }
-            
-            do {
-                let response = try JSONDecoder().decode(ResponseType.self, from: data)
-                callCompletionHandler(response, nil)
-            } catch {
-                callCompletionHandler(nil, error)
-            }
+            handleResponse(data: data, error: error, responseType: responseType, completionHandler: completionHandler)
         }
         task.resume()
     }
@@ -160,12 +145,6 @@ class TMDBClient {
                                                                                    request: RequestType,
                                                                                    responseType: ResponseType.Type,
                                                                                    completionHandler: @escaping (ResponseType?, Error?) -> Void) {
-        let callCompletionHandler = { (response: ResponseType?, error: Error?) in
-            DispatchQueue.main.async {
-                completionHandler(response, error)
-            }
-        }
-        
         //build http body
         var urlRequest = URLRequest(url: url)
         urlRequest.httpMethod = "POST"
@@ -173,18 +152,31 @@ class TMDBClient {
         urlRequest.httpBody = try! JSONEncoder().encode(request)
         
         let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
-            guard let data = data else {
-                callCompletionHandler(nil, error!)
-                return
-            }
-            
-            do {
-                let response = try JSONDecoder().decode(ResponseType.self, from: data)
-                callCompletionHandler(response, nil)
-            } catch {
-                callCompletionHandler(nil, error)
-            }
+            handleResponse(data: data, error: error, responseType: responseType, completionHandler: completionHandler)
         }
         task.resume()
+    }
+    
+    private class func handleResponse<ResponseType: Decodable>(data: Data?,
+                                                          error: Error?,
+                                                          responseType: ResponseType.Type,
+                                                          completionHandler: @escaping (ResponseType?, Error?) -> Void) {
+        let callCompletionHandler = { (response: ResponseType?, error: Error?) in
+            DispatchQueue.main.async {
+                completionHandler(response, error)
+            }
+        }
+        
+        guard let data = data else {
+            callCompletionHandler(nil, error)
+            return
+        }
+        
+        do {
+            let response = try JSONDecoder().decode(ResponseType.self, from: data)
+            callCompletionHandler(response, nil)
+        } catch {
+            callCompletionHandler(nil, error)
+        }
     }
 }
