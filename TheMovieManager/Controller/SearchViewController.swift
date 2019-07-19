@@ -29,7 +29,14 @@ class SearchViewController: UIViewController {
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        
+        TMDBClient.search(query: searchText) { (movies, error) in
+            if let error = error {
+                self.showErrorAlert(message: error.localizedDescription)
+            } else {
+                self.movies = movies
+                self.tableView.reloadData()
+            }
+        }
     }
     
     func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
