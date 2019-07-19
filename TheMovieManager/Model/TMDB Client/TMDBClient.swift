@@ -35,6 +35,7 @@ class TMDBClient {
         case webAuth
         case logout
         case search(query: String)
+        case addToWatchList
         
         var stringValue: String {
             switch self {
@@ -47,6 +48,7 @@ class TMDBClient {
                 + "?redirect_to=" + AppDelegate.appBaseUrl + ":" + AppDelegate.authenticateEndpointPath
             case .logout: return Endpoints.base + "/authentication/session" + Endpoints.apiKeyParam
             case .search(let query): return Endpoints.base + "/search/movie" + Endpoints.apiKeyParam + "&query=" + (query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
+            case .addToWatchList: return Endpoints.base + "/account/\(Auth.accountId)/watchlist" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
             }
         }
         
@@ -81,6 +83,17 @@ class TMDBClient {
                 completion(movieResults.results, nil)
             } else {
                 completion([], error)
+            }
+        }
+    }
+    
+    class func watchlist(mediaId: Int, watchlist: Bool, completion: @escaping (Bool, Error?) -> Void) {
+        let watchlistRequest = MarkWatchlist(mediaType: MediaType.movie, mediaId: mediaId, watchlist: watchlist)
+        taskForPostRequest(url: Endpoints.addToWatchList.url, request: watchlistRequest, responseType: MarkWatchlistResponse.self) { (result, error) in
+            if let result = result {
+                completion(true, nil)
+            } else {
+                completion(false, error)
             }
         }
     }

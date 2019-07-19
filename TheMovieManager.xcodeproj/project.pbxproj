@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1842DEB922E1C15700D38628 /* MarkWatchlistResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1842DEB822E1C15700D38628 /* MarkWatchlistResponse.swift */; };
 		2311AC0A2178E31500137A84 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2311AC092178E31500137A84 /* Colors.xcassets */; };
 		231688492121C92C003C820E /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 231688482121C92C003C820E /* AppDelegate.swift */; };
 		2316884B2121C92C003C820E /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2316884A2121C92C003C820E /* LoginViewController.swift */; };
@@ -38,6 +39,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		1842DEB822E1C15700D38628 /* MarkWatchlistResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MarkWatchlistResponse.swift; path = "../../../../../../../../../System/Volumes/Data/Users/apple/Documents/Udacity/iOS/TheMovieManager/TheMovieManager/Model/TMDB Responses/MarkWatchlistResponse.swift"; sourceTree = "<group>"; };
 		2311AC092178E31500137A84 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
 		231688452121C92C003C820E /* TheMovieManager.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TheMovieManager.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		231688482121C92C003C820E /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -185,6 +187,7 @@
 				231688782121CB74003C820E /* RequestTokenResponse.swift */,
 				2316887A2121CB87003C820E /* TMDBResponse.swift */,
 				2316887C2121CB9A003C820E /* SessionResponse.swift */,
+				1842DEB822E1C15700D38628 /* MarkWatchlistResponse.swift */,
 			);
 			path = "TMDB Responses";
 			sourceTree = "<group>";
@@ -283,6 +286,7 @@
 				231688772121CB50003C820E /* MovieResults.swift in Sources */,
 				231688872121CBF9003C820E /* PostSession.swift in Sources */,
 				2316888D2122322D003C820E /* Colors.swift in Sources */,
+				1842DEB922E1C15700D38628 /* MarkWatchlistResponse.swift in Sources */,
 				2316888F2122646A003C820E /* GradientView.swift in Sources */,
 				2316887F2121CBC7003C820E /* MarkFavorite.swift in Sources */,
 				2316887B2121CB87003C820E /* TMDBResponse.swift in Sources */,
