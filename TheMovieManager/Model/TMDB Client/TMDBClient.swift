@@ -38,7 +38,7 @@ class TMDBClient {
         var stringValue: String {
             switch self {
             case .getWatchlist: return Endpoints.base + "/account/\(Auth.accountId)/watchlist/movies" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
-            case .getFavorites: return Endpoints.base + "/account/\(Auth.accountId)/favorites/movies" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
+            case .getFavorites: return Endpoints.base + "/account/\(Auth.accountId)/favorite/movies" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
             case .getRequestToken: return Endpoints.base + "/authentication/token/new" + Endpoints.apiKeyParam
             case .login: return Endpoints.base + "/authentication/token/validate_with_login" + Endpoints.apiKeyParam
             case .createSessionId: return Endpoints.base + "/authentication/session/new" + Endpoints.apiKeyParam
