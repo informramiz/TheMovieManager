@@ -89,7 +89,7 @@ class TMDBClient {
     
     class func watchlist(mediaId: Int, watchlist: Bool, completion: @escaping (Bool, Error?) -> Void) {
         let watchlistRequest = MarkWatchlist(mediaType: MediaType.movie, mediaId: mediaId, watchlist: watchlist)
-        taskForPostRequest(url: Endpoints.addToWatchList.url, request: watchlistRequest, responseType: MarkWatchlistResponse.self) { (result, error) in
+        taskForPostRequest(url: Endpoints.addToWatchList.url, request: watchlistRequest, responseType: TMDBResponse.self) { (result, error) in
             if let result = result {
                 completion(true, nil)
             } else {
