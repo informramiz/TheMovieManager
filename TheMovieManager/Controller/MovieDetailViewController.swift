@@ -35,7 +35,19 @@ class MovieDetailViewController: UIViewController {
     }
     
     @IBAction func watchlistButtonTapped(_ sender: UIBarButtonItem) {
-        
+        TMDBClient.watchlist(mediaId: movie.id, watchlist: !isWatchlist) { (success, error) in
+            if success {
+                if (!self.isWatchlist) {
+                    MovieModel.watchlist.append(self.movie)
+                } else {
+                    MovieModel.watchlist = MovieModel.watchlist.filter { $0 != self.movie }
+                }
+            } else {
+                self.showErrorAlert(message: error?.localizedDescription ?? "Uknown error ocurred")
+            }
+            
+            self.toggleBarButton(sender, enabled: self.isWatchlist)
+        }
     }
     
     @IBAction func favoriteButtonTapped(_ sender: UIBarButtonItem) {
