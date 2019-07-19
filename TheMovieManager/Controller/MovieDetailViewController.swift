@@ -51,7 +51,19 @@ class MovieDetailViewController: UIViewController {
     }
     
     @IBAction func favoriteButtonTapped(_ sender: UIBarButtonItem) {
-
+        TMDBClient.markFavorite(mediaId: movie.id, favorite: !isFavorite) { (success, error) in
+            if success {
+                if (!self.isFavorite) {
+                    MovieModel.favorites.append(self.movie)
+                } else {
+                    MovieModel.favorites = MovieModel.favorites.filter { $0 != self.movie }
+                }
+            } else {
+                self.showErrorAlert(message: error?.localizedDescription ?? "Uknown error ocurred")
+            }
+            
+            self.toggleBarButton(sender, enabled: self.isFavorite)
+        }
     }
     
     func toggleBarButton(_ button: UIBarButtonItem, enabled: Bool) {
@@ -61,6 +73,4 @@ class MovieDetailViewController: UIViewController {
             button.tintColor = UIColor.gray
         }
     }
-    
-    
 }

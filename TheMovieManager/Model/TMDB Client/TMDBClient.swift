@@ -36,6 +36,7 @@ class TMDBClient {
         case logout
         case search(query: String)
         case addToWatchList
+        case markFavorite
         
         var stringValue: String {
             switch self {
@@ -49,6 +50,7 @@ class TMDBClient {
             case .logout: return Endpoints.base + "/authentication/session" + Endpoints.apiKeyParam
             case .search(let query): return Endpoints.base + "/search/movie" + Endpoints.apiKeyParam + "&query=" + (query.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")
             case .addToWatchList: return Endpoints.base + "/account/\(Auth.accountId)/watchlist" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
+            case .markFavorite: return Endpoints.base + "/account/\(Auth.accountId)/favorite" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
             }
         }
         
@@ -90,6 +92,17 @@ class TMDBClient {
     class func watchlist(mediaId: Int, watchlist: Bool, completion: @escaping (Bool, Error?) -> Void) {
         let watchlistRequest = MarkWatchlist(mediaType: MediaType.movie, mediaId: mediaId, watchlist: watchlist)
         taskForPostRequest(url: Endpoints.addToWatchList.url, request: watchlistRequest, responseType: TMDBResponse.self) { (result, error) in
+            if let result = result {
+                completion(result.isSuccess, nil)
+            } else {
+                completion(false, error)
+            }
+        }
+    }
+    
+    class func markFavorite(mediaId: Int, favorite: Bool, completion: @escaping (Bool, Error?) -> Void) {
+        let markFavoriteRequest = MarkFavorite(mediaType: MediaType.movie, mediaId: mediaId, favorite: favorite)
+        taskForPostRequest(url: Endpoints.markFavorite.url, request: markFavoriteRequest, responseType: TMDBResponse.self) { (result, error) in
             if let result = result {
                 completion(result.isSuccess, nil)
             } else {
