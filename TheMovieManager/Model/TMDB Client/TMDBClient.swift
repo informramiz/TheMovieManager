@@ -28,6 +28,7 @@ class TMDBClient {
         static let apiKeyParam = "?api_key=\(TMDBClient.apiKey)"
         
         case getWatchlist
+        case getFavorites
         case getRequestToken
         case login
         case createSessionId
@@ -37,6 +38,7 @@ class TMDBClient {
         var stringValue: String {
             switch self {
             case .getWatchlist: return Endpoints.base + "/account/\(Auth.accountId)/watchlist/movies" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
+            case .getFavorites: return Endpoints.base + "/account/\(Auth.accountId)/favorites/movies" + Endpoints.apiKeyParam + "&session_id=\(Auth.sessionId)"
             case .getRequestToken: return Endpoints.base + "/authentication/token/new" + Endpoints.apiKeyParam
             case .login: return Endpoints.base + "/authentication/token/validate_with_login" + Endpoints.apiKeyParam
             case .createSessionId: return Endpoints.base + "/authentication/session/new" + Endpoints.apiKeyParam
@@ -58,6 +60,16 @@ class TMDBClient {
                 completion(movieResults.results, nil)
             } else {
                 completion([], error)
+            }
+        }
+    }
+    
+    class func getFavorites(completion: @escaping ([Movie], Error?) -> Void) {
+        taskForGetRequest(url: Endpoints.getFavorites.url, responseType: MovieResults.self) { (movieResults, error) in
+            if let movieResults = movieResults {
+                completion(movieResults.results, nil)
+            } else {
+                completion([], nil)
             }
         }
     }
