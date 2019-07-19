@@ -56,15 +56,15 @@ extension FavoritesViewController: UITableViewDataSource, UITableViewDelegate {
         let movie = MovieModel.favorites[indexPath.row]
         
         cell.textLabel?.text = movie.title
-        downloadPosterImage(movie) { (image) in
+        downloadPosterImage(movie.posterPath) { (image) in
             cell.imageView?.image = image
             cell.setNeedsLayout()
         }
         return cell
     }
     
-    private func downloadPosterImage(_ movie: Movie, successHandler: @escaping (UIImage?) -> Void) {
-        guard let posterPath = movie.posterPath else { return }
+    private func downloadPosterImage(_ posterPath: String?, successHandler: @escaping (UIImage?) -> Void) {
+        guard let posterPath = posterPath else { return }
         TMDBClient.downloadImage(posterPath: posterPath) { (data, error) in
             guard let data = data else {
                 return
