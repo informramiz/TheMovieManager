@@ -91,7 +91,7 @@ class TMDBClient {
         let watchlistRequest = MarkWatchlist(mediaType: MediaType.movie, mediaId: mediaId, watchlist: watchlist)
         taskForPostRequest(url: Endpoints.addToWatchList.url, request: watchlistRequest, responseType: TMDBResponse.self) { (result, error) in
             if let result = result {
-                completion(true, nil)
+                completion(result.isSuccess, nil)
             } else {
                 completion(false, error)
             }

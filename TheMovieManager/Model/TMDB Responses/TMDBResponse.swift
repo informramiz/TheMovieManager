@@ -16,4 +16,8 @@ struct TMDBResponse: Codable {
         case statusCode = "status_code"
         case statusMessage = "status_message"
     }
+    
+    var isSuccess: Bool {
+        return statusCode == 1 || statusCode == 12 || statusCode == 13
+    }
 }
