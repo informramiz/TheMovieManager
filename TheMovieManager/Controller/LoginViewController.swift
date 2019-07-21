@@ -15,6 +15,7 @@ class LoginViewController: UIViewController {
     @IBOutlet weak var passwordTextField: UITextField!
     @IBOutlet weak var loginButton: UIButton!
     @IBOutlet weak var loginViaWebsiteButton: UIButton!
+    @IBOutlet weak var activityIndicator: UIActivityIndicatorView!
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -24,8 +25,17 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginTapped(_ sender: UIButton) {
+        loggingIn(true)
         getRequestToken {
             self.login()
+        }
+    }
+    
+    @IBAction func loginViaWebsiteTapped() {
+        loggingIn(true)
+        getRequestToken {
+            print("OAuth url" + TMDBClient.Endpoints.webAuth.url.absoluteString)
+            UIApplication.shared.open(TMDBClient.Endpoints.webAuth.url, options: [:], completionHandler: nil)
         }
     }
     
@@ -63,16 +73,17 @@ class LoginViewController: UIViewController {
                 return
             }
             
+            self.loggingIn(false)
             print("Successfully created session id: \(TMDBClient.Auth.sessionId)")
             self.performSegue(withIdentifier: "completeLogin", sender: nil)
         }
     }
     
-    @IBAction func loginViaWebsiteTapped() {
-        getRequestToken {
-            print("OAuth url" + TMDBClient.Endpoints.webAuth.url.absoluteString)
-            UIApplication.shared.open(TMDBClient.Endpoints.webAuth.url, options: [:], completionHandler: nil)
+    func loggingIn(_ loggingIn: Bool) {
+        if loggingIn {
+            activityIndicator.startAnimating()
+        } else {
+            activityIndicator.stopAnimating()
         }
     }
-    
 }
