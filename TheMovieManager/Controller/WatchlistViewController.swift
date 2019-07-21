@@ -54,6 +54,7 @@ extension WatchlistViewController: UITableViewDataSource, UITableViewDelegate {
         let movie = MovieModel.watchlist[indexPath.row]
         
         cell.textLabel?.text = movie.title
+        cell.imageView?.image = UIImage(named: "PosterPlaceholder")
         downloadPosterImage(movie.posterPath) { (image) in
             cell.imageView?.image = image
             cell.setNeedsLayout()
