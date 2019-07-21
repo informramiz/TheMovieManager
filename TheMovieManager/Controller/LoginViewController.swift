@@ -85,5 +85,10 @@ class LoginViewController: UIViewController {
         } else {
             activityIndicator.stopAnimating()
         }
+        
+        emailTextField.isEnabled = !loggingIn
+        passwordTextField.isEnabled = !loggingIn
+        loginButton.isEnabled = !loggingIn
+        loginViaWebsiteButton.isEnabled = !loggingIn
     }
 }
