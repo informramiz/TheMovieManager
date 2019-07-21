@@ -16,6 +16,7 @@ class SearchViewController: UIViewController {
     var movies = [Movie]()
     
     var selectedIndex = 0
+    var searchTask: URLSessionTask?
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "showDetail" {
@@ -29,13 +30,11 @@ class SearchViewController: UIViewController {
 extension SearchViewController: UISearchBarDelegate {
     
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        TMDBClient.search(query: searchText) { (movies, error) in
-            if let error = error {
-                self.showErrorAlert(message: error.localizedDescription)
-            } else {
-                self.movies = movies
-                self.tableView.reloadData()
-            }
+        //cancel existing task, if any
+        searchTask?.cancel()
+        searchTask = TMDBClient.search(query: searchText) { (movies, error) in
+            self.movies = movies
+            self.tableView.reloadData()
         }
     }
     

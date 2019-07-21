@@ -81,8 +81,8 @@ class TMDBClient {
         }
     }
     
-    class func search(query: String, completion: @escaping ([Movie], Error?) -> Void) {
-        taskForGetRequest(url: Endpoints.search(query: query).url, responseType: MovieResults.self) { (movieResults, error) in
+    class func search(query: String, completion: @escaping ([Movie], Error?) -> Void) -> URLSessionTask {
+        return taskForGetRequest(url: Endpoints.search(query: query).url, responseType: MovieResults.self) { (movieResults, error) in
             if let movieResults = movieResults {
                 completion(movieResults.results, nil)
             } else {
@@ -177,13 +177,14 @@ class TMDBClient {
      generic type `ResponseType`. We need this because in Swift we can't specialize functions by writing them like `taskForGetRequest<MyType>(...)`
      as this syntax is invalid in Swift. So the only way to receive type info is to pass type info as param
      */
-    class func taskForGetRequest<ResponseType: Decodable>(url: URL,
+    @discardableResult class func taskForGetRequest<ResponseType: Decodable>(url: URL,
                                                           responseType: ResponseType.Type,
-                                                          completionHandler: @escaping (ResponseType?, Error?) -> Void) {
+                                                          completionHandler: @escaping (ResponseType?, Error?) -> Void) -> URLSessionTask {
         let task = URLSession.shared.dataTask(with: url) { data, response, error in
             handleResponse(data: data, error: error, responseType: responseType, completionHandler: completionHandler)
         }
         task.resume()
+        return task
     }
     
     /*
