@@ -21,3 +21,9 @@ struct TMDBResponse: Codable {
         return statusCode == 1 || statusCode == 12 || statusCode == 13
     }
 }
+
+extension TMDBResponse: LocalizedError {
+    var errorDescription: String? {
+        return statusMessage
+    }
+}

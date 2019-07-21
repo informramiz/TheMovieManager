@@ -44,6 +44,7 @@ class LoginViewController: UIViewController {
             guard success else {
                 let errorMessage = error?.localizedDescription ?? ""
                 self.showErrorAlert(message: errorMessage)
+                self.loggingIn(false)
                 return
             }
             
@@ -58,6 +59,7 @@ class LoginViewController: UIViewController {
         TMDBClient.login(username: username, password: password) { (success, error) in
             guard success else {
                 self.showErrorAlert(message: error?.localizedDescription ?? "Login failed due to unknown error")
+                self.loggingIn(false)
                 return
             }
             
@@ -68,12 +70,12 @@ class LoginViewController: UIViewController {
     
     func createSessionId() {
         TMDBClient.createSessionId { (success, error) in
+            self.loggingIn(false)
             guard success else {
                 self.showErrorAlert(message: error?.localizedDescription ?? "Login Failed due to unknown error")
                 return
             }
             
-            self.loggingIn(false)
             print("Successfully created session id: \(TMDBClient.Auth.sessionId)")
             self.performSegue(withIdentifier: "completeLogin", sender: nil)
         }

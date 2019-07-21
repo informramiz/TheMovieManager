@@ -227,6 +227,17 @@ class TMDBClient {
             let response = try JSONDecoder().decode(ResponseType.self, from: data)
             callCompletionHandler(response, nil)
         } catch {
+            handleError(data, callCompletionHandler)
+        }
+    }
+    
+    private class func handleError<ResponseType: Decodable>(_ data: Data,
+                                                            _ callCompletionHandler: (ResponseType?, Error?) -> ()) {
+        //try parsing the error to TMDB error object
+        do {
+            let errorResponse = try JSONDecoder().decode(TMDBResponse.self, from: data)
+            callCompletionHandler(nil, errorResponse)
+        } catch {
             callCompletionHandler(nil, error)
         }
     }
