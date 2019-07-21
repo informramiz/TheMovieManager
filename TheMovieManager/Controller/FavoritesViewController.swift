@@ -56,6 +56,8 @@ extension FavoritesViewController: UITableViewDataSource, UITableViewDelegate {
         let movie = MovieModel.favorites[indexPath.row]
         
         cell.textLabel?.text = movie.title
+        //set a placeholder image
+        cell.imageView?.image = UIImage(named: "PosterPlaceholder")
         downloadPosterImage(movie.posterPath) { (image) in
             cell.imageView?.image = image
             cell.setNeedsLayout()
